@@ -21,7 +21,7 @@ It also marks the post as "uploaded" in the sheet to avoid duplicates.
    - Only returns **1 row** to avoid duplicate posts.
 
 2. ### AI Agent
-   - Uses Gemini API to generate a professional caption.
+   - Uses Gemini API (Google's free AI) to generate a professional caption.
    - Includes:
      - Emojis
      - Hashtags
@@ -63,21 +63,31 @@ It also marks the post as "uploaded" in the sheet to avoid duplicates.
 
 ---
 
-## 🧠 Notes
+## 📄 Google Sheets Format
 
-- ✅ Only posts one product per run.
-- 🧠 Caption formatting avoids a "bot-like" feel and follows your branding tone.
-- 📷 Ensure image URLs are fully public and link directly to the file (no redirects, cookies, or HTML pages).
-- ⚙️ All Facebook/Instagram tokens must be from a Business Account.
-- 📌 `Node ID` used in API must match the Instagram Business Account ID linked to your Page.
-
----
-
-## 🗂 Google Sheets Format Example
+Your Google Sheet should have this format:
 
 | ID | title | description | price | sale_price | mainimage | carousel1 | carousel2 | carousel3 | uploaded? |
 |----|-------|-------------|-------|------------|-----------|-----------|-----------|-----------|-----------|
 | 1  | Product Name | Short desc | 500 | 400 | img1.jpg | img2.jpg | img3.jpg | img4.jpg | no |
+
+![Screenshot 2025-05-30 130035](https://github.com/user-attachments/assets/7ad3e8bb-29fc-45c1-9b8c-33193325cc76)
+
+---
+
+## 🤖 Gemini API (Free AI Caption Generator)
+
+This workflow uses **Google’s Gemini 1.5 Flash model**, which is **free to use** under the Gemini API.
+
+To get your API key:
+
+1. Go to the official Gemini API key page:  
+   👉 [https://ai.google.dev/gemini-api/docs/api-key](https://ai.google.dev/gemini-api/docs/api-key)
+
+2. Click **Get API Key** and sign in with your Google Account.
+3. Copy the generated API key and paste it into your n8n Gemini API Credential.
+
+That’s it — captions will now be automatically generated using Google AI.
 
 ---
 
@@ -93,13 +103,3 @@ This video walks you through:
 - Getting access tokens
 - Setting up the correct permissions
 - Linking your Instagram Business Account
-
----
-
-## Support Development
-
-If you find this project useful and would like to support further development, you can donate Bitcoin to the following address:
-
-Bitcoin Address: `17Uv9ZgoKFXdi18PNf5UighASk53KMjzxp`
-
-Your contributions will be greatly appreciated and will help in maintaining and improving this project. Thank you for your support!
