@@ -1,4 +1,4 @@
-# 📸 Google Sheets to Instagram Carousel Post Automation
+# 📸 Google Sheets to Instagram Carousel Post Automation Via Locally Hosted N8n
 
 ## Overview
 This n8n workflow reads product data from a **Google Sheet**, generates a professional **Instagram carousel post caption using AI**, uploads up to 4 images, and publishes the post via the **Facebook Graph API** to your linked **Instagram business account**.
