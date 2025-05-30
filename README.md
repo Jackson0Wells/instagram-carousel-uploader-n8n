@@ -1,105 +1,139 @@
-# 📸 Google Sheets to Instagram Carousel Post Automation Via Locally Hosted N8n
+# 📸 Google Sheets to Instagram Carousel Post Automation via Locally Hosted n8n
 
 ## Overview
-This n8n workflow reads product data from a **Google Sheet**, generates a professional **Instagram carousel post caption using AI**, uploads up to 4 images, and publishes the post via the **Facebook Graph API** to your linked **Instagram business account**.
 
-It also marks the post as "uploaded" in the sheet to avoid duplicates.
+This n8n workflow reads product data from a **Google Sheet**, generates a professional **Instagram carousel post caption using AI**, uploads up to 4 images, and publishes the post via the **Facebook Graph API** to your linked **Instagram Business Account**.
+
+It also marks the post as `"uploaded"` in the sheet to avoid duplicates.
 
 ---
 
 ## 🔁 Trigger
 
-- **Schedule Trigger**: Runs every 2 hours by default (you can change the interval).
+- **Schedule Trigger**: Runs every 2 hours by default (can be changed to fit your posting frequency).
 
 ---
 
 ## 📋 Step-by-Step Flow
 
-1. ### Google Sheets - "Is Uploaded?" Node
-   - Connects to your product sheet.
-   - Filters products where the `uploaded?` column is `"no"`.
-   - Only returns **1 row** to avoid duplicate posts.
+### 1. Google Sheets – "Is Uploaded?" Filter
 
-2. ### AI Agent
-   - Uses Gemini API (Google's free AI) to generate a professional caption.
-   - Includes:
-     - Emojis
-     - Hashtags
-     - Call to action
-   - Prompts users to check the Instagram bio for the website link (no URLs in caption).
+- Connects to your product sheet.
+- Filters rows where the `uploaded?` column is set to `"no"`.
+- Returns **only 1 row** at a time to prevent batch duplicates.
 
-3. ### Edit Fields
-   - Extracts required fields:
-     - Instagram Node ID
-     - Product title & description
-     - Image URLs: `mainimage`, `carousel1`, `carousel2`, `carousel3`
-     - Caption from Gemini
+### 2. Gemini AI Agent
 
-4. ### Image Uploads
-   - Up to **4 image upload nodes** post each image to Instagram as a container item.
-   - Images must be public, direct JPG/PNG links.
-   - Each upload is conditional:
-     - If image URL exists → upload via Facebook Graph API
-     - If not → skip node
+- Uses Google’s **Gemini 1.5 Flash** (free) to generate professional captions.
+- Captions include:
+  - Emojis
+  - Hashtags
+  - Pricing callout
+  - Soft CTA prompting users to "Check our bio for the link" (no direct URLs in post)
 
-5. ### Merge + Prepare Carousel Media IDs
-   - Merges uploaded image nodes.
-   - Outputs a single row with all image `media_id`s using this format:
-     ```json
-     {
-       "children": "17932447635024904,17872489326361281"
-     }
-     ```
+### 3. Edit Fields
 
-6. ### Create Carousel Container
-   - Sends the image `media_ids` + Gemini-generated caption to create a carousel container.
-   - Links to the Instagram Business Account ID.
+- Prepares and formats:
+  - Product title, description, and price
+  - Image URLs from `mainimage`, `carousel1`, `carousel2`, `carousel3`
+  - Gemini-generated caption
+  - Instagram Page ID
 
-7. ### Post to Instagram
-   - Publishes the carousel post live on Instagram.
+### 4. Image Uploads (Flexible)
 
-8. ### Google Sheets - Mark Uploaded
-   - Updates the corresponding row’s `uploaded?` column to `"yes"` so it doesn’t get posted again.
+- Supports **1 to 4 image URLs** from the Google Sheet.
+- Each upload is handled by a **separate Facebook Graph API node**.
+- Upload is **conditionally skipped** if the image URL is empty.
+- This makes the workflow dynamic — it will still post even if only 1 or 2 images are available.
+- Uploaded image container IDs are collected for use in the next step.
+
+### 5. Merge + Prepare Carousel Media IDs
+
+- Merges successful image uploads into one dataset.
+- Outputs image media IDs in a `children` field like:
+
+```json
+{
+  "children": "17932447635024904,17872489326361281"
+}
+```
+
+### 6. Create Carousel Container
+
+- Sends the `children` media IDs + caption to the Graph API.
+- This creates the Instagram Carousel Container tied to your business account.
+
+### 7. Post to Instagram
+
+- Final API call publishes the carousel post to your Instagram feed.
+
+### 8. Google Sheets – Mark as Uploaded
+
+- Updates the `uploaded?` column of the posted row to `"yes"` to prevent reposting.
 
 ---
 
 ## 📄 Google Sheets Format
 
-Your Google Sheet should have this format:
+The spreadsheet should look like this:
 
 | ID | title | description | price | sale_price | mainimage | carousel1 | carousel2 | carousel3 | uploaded? |
 |----|-------|-------------|-------|------------|-----------|-----------|-----------|-----------|-----------|
-| 1  | Product Name | Short desc | 500 | 400 | img1.jpg | img2.jpg | img3.jpg | img4.jpg | no |
+| 1  | Product Name | Short description | 500 | 400 | img1.jpg | img2.jpg | img3.jpg | img4.jpg | no |
 
-![Screenshot 2025-05-30 130035](https://github.com/user-attachments/assets/7ad3e8bb-29fc-45c1-9b8c-33193325cc76)
+![Screenshot 2025-05-30 130035](https://github.com/user-attachments/assets/2f2d42a0-f371-41ff-b4db-089dfbf72d3c)
+
 
 ---
 
 ## 🤖 Gemini API (Free AI Caption Generator)
 
-This workflow uses **Google’s Gemini 1.5 Flash model**, which is **free to use** under the Gemini API.
+This project uses Google’s **Gemini 1.5 Flash model** — a free, fast, and powerful AI caption generator.
 
-To get your API key:
+To use it:
 
-1. Go to the official Gemini API key page:  
-   👉 [https://ai.google.dev/gemini-api/docs/api-key](https://ai.google.dev/gemini-api/docs/api-key)
+1. Visit the official Gemini API key page:  
+   https://ai.google.dev/gemini-api/docs/api-key
 
-2. Click **Get API Key** and sign in with your Google Account.
-3. Copy the generated API key and paste it into your n8n Gemini API Credential.
+2. Click “Get API Key” and sign in with your Google account.
 
-That’s it — captions will now be automatically generated using Google AI.
+3. Paste the generated API key into your n8n Gemini credential.
+
+Captions are automatically created for each post!
 
 ---
 
-## 📺 Facebook API Setup (Video Guide)
+## 📺 Facebook/Instagram API Setup (Video Guide)
 
-To configure your Meta App and get Instagram Graph API access:
+If you're new to Meta’s Graph API, this guide is highly recommended:
 
-👉 **Watch this step-by-step YouTube guide**:  
-[https://www.youtube.com/watch?v=AGSyWdjN5A4&ab_channel=Let%27sAutomateIt](https://www.youtube.com/watch?v=AGSyWdjN5A4&ab_channel=Let%27sAutomateIt)
+**Watch here:**  
+https://www.youtube.com/watch?v=AGSyWdjN5A4&ab_channel=Let%27sAutomateIt
 
-This video walks you through:
+It covers:
 - Creating a Meta Developer App
-- Getting access tokens
-- Setting up the correct permissions
-- Linking your Instagram Business Account
+- Setting up permissions
+- Access token generation
+- Linking Instagram and Facebook Business accounts
+
+---
+
+## ⚠️ Disclaimer
+
+This was a quick fix for a specific workflow need.  
+It may not be the most scalable or universal solution — but it **works reliably for our use case**.  
+Feel free to fork, improve, or adapt it to your setup.
+
+---
+
+⭐ Star the repo if this helped!
+
+---
+
+## Support Development
+
+If you find this project useful and would like to support further development, you can donate Bitcoin to the following address:
+
+Bitcoin Address: `17Uv9ZgoKFXdi18PNf5UighASk53KMjzxp`
+
+Your contributions will be greatly appreciated and will help in maintaining and improving this project. Thank you for your support!
