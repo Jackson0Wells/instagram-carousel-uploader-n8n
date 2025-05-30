@@ -95,4 +95,11 @@ This video walks you through:
 - Linking your Instagram Business Account
 
 ---
-Let me know if you want to extend this to post on your Facebook Page too or sync with other platforms.
+
+## Support Development
+
+If you find this project useful and would like to support further development, you can donate Bitcoin to the following address:
+
+Bitcoin Address: `17Uv9ZgoKFXdi18PNf5UighASk53KMjzxp`
+
+Your contributions will be greatly appreciated and will help in maintaining and improving this project. Thank you for your support!
