@@ -83,7 +83,6 @@ The spreadsheet should look like this:
 
 ![Screenshot 2025-05-30 130035](https://github.com/user-attachments/assets/2f2d42a0-f371-41ff-b4db-089dfbf72d3c)
 
-
 ---
 
 ## 🤖 Gemini API (Free AI Caption Generator)
@@ -115,6 +114,23 @@ It covers:
 - Setting up permissions
 - Access token generation
 - Linking Instagram and Facebook Business accounts
+
+---
+
+### 🔎 How to Find Your Instagram Page ID (Node)
+
+To find the value required for the `Node` field inside your **Create Carousel Container** step:
+
+1. Go to the Meta Developer Portal:  
+   👉 https://developers.facebook.com/apps/
+
+2. Select your App or create a new one.
+
+3. Navigate to https://developers.facebook.com/apps/your-app-id/instagram-business/API-Setup/
+
+You can also refer to this visual guide:  
+![Untitled-3](https://github.com/user-attachments/assets/0b0a7149-4bf6-4ead-8763-db0853e42b82)
+
 
 ---
 
