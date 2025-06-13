@@ -1,0 +1,1079 @@
+{
+  "name": "My workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "hours",
+              "hoursInterval": 2
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -1640,
+        280
+      ],
+      "id": "0353286b-7007-4730-a5d3-713ed49fc5a9",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "24a5435b-0cae-4073-a418-04079babfec4",
+              "name": "Caption",
+              "value": "={{ $json.output }}",
+              "type": "string"
+            },
+            {
+              "id": "db233d98-9f75-4e46-8ecc-9fe80cc055db",
+              "name": "Node",
+              "value": "place node id here",
+              "type": "string"
+            },
+            {
+              "id": "27cf721b-5602-402c-b478-5965a563e812",
+              "name": "mainimage",
+              "value": "={{ $('Is Uploaded?').item.json.mainimage }}",
+              "type": "string"
+            },
+            {
+              "id": "c53958de-e046-4656-b9fc-aba0a91ae2e9",
+              "name": "carousel1",
+              "value": "={{ $('Is Uploaded?').item.json.carousel1 }}",
+              "type": "string"
+            },
+            {
+              "id": "8dd04bad-0c5b-4070-81ad-dfb7e5e6df29",
+              "name": "carousel2",
+              "value": "={{ $('Is Uploaded?').item.json.carousel2 }}",
+              "type": "string"
+            },
+            {
+              "id": "2bf2b524-5571-483f-8191-1962161641e0",
+              "name": "carousel3",
+              "value": "={{ $('Is Uploaded?').item.json.carousel3 }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -840,
+        280
+      ],
+      "id": "f5cc3058-f416-4984-b0ba-44c7a4375e31",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Create an Instagram ad description based on the following. Use 4-5 relevant hashtags. Ensure the text is between 500–800 characters, includes emojis, and formats neatly with proper spacing and line breaks.\n\nImportant Instructions:\n\nDO NOT use the * symbol, do not make any text bold. The only symbols you can use are (,.-)\nDo NOT include any website URLs or clickable links.\n\nInstead, prompt users to check the Instagram bio for the link to order or learn more.\n\nAll prices must be displayed in R (South African Rand).\n\nOutput should be formatted for a direct Instagram post using the n8n post node.\n\nThe following is the product info:\n\nTitle:\n{{ $json.title }}\n\nDescription:\n{{ $json.description }}\n\nPrice:\nPrice: {{ $json.price }}\nSale Price: {{ $json.sale_price }}\n\nHere is an updated example output for reference:\n\n📸 Instantly print your favorite memories with the Xiaomi Instant Photo Printer 1S Set!\nThis all-in-one kit lets you snap moments on your phone and turn them into beautiful prints in just minutes. With vivid color accuracy, multiple print options, and a bonus 50-page photo album, it’s perfect for memory lovers! 🎞️✨\n\n🔥 LIMITED-TIME OFFER\nGet it now for just R3335 (Was R4175) – Save big while stocks last! 🛒\n\n🔗 Tap the link in our bio to order or learn more!\n\n#InstantPhotoPrinter #PhotographyLovers #XiaomiPrinter #PrintYourMemories #NovaStoreTech",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2,
+      "position": [
+        -1200,
+        280
+      ],
+      "id": "0cf672ea-d316-4ff3-a28c-3318339e6308",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-1.5-flash",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        -1160,
+        500
+      ],
+      "id": "7cb3032e-4fd0-49e5-b17c-996b621ed224",
+      "name": "Google Gemini Chat Model"
+    },
+    {
+      "parameters": {
+        "httpRequestMethod": "POST",
+        "graphApiVersion": "v22.0",
+        "node": "={{ $('Edit Fields').item.json.Node }}",
+        "edge": "media_publish",
+        "options": {
+          "queryParameters": {
+            "parameter": [
+              {
+                "name": "creation_id",
+                "value": "={{ $json.id }}"
+              }
+            ]
+          }
+        }
+      },
+      "type": "n8n-nodes-base.facebookGraphApi",
+      "typeVersion": 1,
+      "position": [
+        1640,
+        260
+      ],
+      "id": "05c6762a-519f-4253-81e7-113278385203",
+      "name": "Post to IG"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "<Google Sheets ID>",
+          "mode": "list",
+          "cachedResultName": "",
+          "cachedResultUrl": ""
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "",
+          "cachedResultUrl": ""
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "uploaded?": "yes",
+            "ID": "={{ $('Is Uploaded?').item.json.ID }}"
+          },
+          "matchingColumns": [
+            "ID"
+          ],
+          "schema": [
+            {
+              "id": "ID",
+              "displayName": "ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "title",
+              "displayName": "title",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "description",
+              "displayName": "description",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "price",
+              "displayName": "price",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "sale_price",
+              "displayName": "sale_price",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "product_link",
+              "displayName": "product_link",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "mainimage",
+              "displayName": "mainimage",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "carousel1",
+              "displayName": "carousel1",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "carousel2",
+              "displayName": "carousel2",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "carousel3",
+              "displayName": "carousel3",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "uploaded?",
+              "displayName": "uploaded?",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        1860,
+        260
+      ],
+      "id": "c1738cf0-5f5a-4ac8-841d-ba3c2124b6af",
+      "name": "Mark Uploaded"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "<Google Sheets ID>",
+          "mode": "list",
+          "cachedResultName": "",
+          "cachedResultUrl": ""
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "",
+          "cachedResultUrl": ""
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "uploaded?",
+              "lookupValue": "no"
+            }
+          ]
+        },
+        "options": {
+          "returnFirstMatch": true
+        }
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        -1420,
+        280
+      ],
+      "id": "badc2312-f679-4bf3-8ca5-46b6e80ab0e5",
+      "name": "Is Uploaded?"
+    },
+    {
+      "parameters": {
+        "httpRequestMethod": "POST",
+        "graphApiVersion": "v22.0",
+        "node": "={{ $json.Node }}",
+        "edge": "media",
+        "options": {
+          "queryParameters": {
+            "parameter": [
+              {
+                "name": "image_url",
+                "value": "={{ $json.mainimage }}"
+              },
+              {
+                "name": "is_carousel_item",
+                "value": "true"
+              }
+            ]
+          }
+        }
+      },
+      "type": "n8n-nodes-base.facebookGraphApi",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "8f3b65f2-abe2-499b-9b16-e20e00be18bf",
+      "name": "Facebook Graph API",
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "httpRequestMethod": "POST",
+        "graphApiVersion": "v22.0",
+        "node": "={{ $json.Node }}",
+        "edge": "media",
+        "options": {
+          "queryParameters": {
+            "parameter": [
+              {
+                "name": "image_url",
+                "value": "={{ $json.carousel2 }}"
+              },
+              {
+                "name": "is_carousel_item",
+                "value": "true"
+              }
+            ]
+          }
+        }
+      },
+      "type": "n8n-nodes-base.facebookGraphApi",
+      "typeVersion": 1,
+      "position": [
+        0,
+        300
+      ],
+      "id": "391ee280-f317-4148-93c5-3e1d5b9d3e53",
+      "name": "Facebook Graph API2",
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "httpRequestMethod": "POST",
+        "graphApiVersion": "v22.0",
+        "node": "={{ $json.Node }}",
+        "edge": "media",
+        "options": {
+          "queryParameters": {
+            "parameter": [
+              {
+                "name": "image_url",
+                "value": "={{ $json.carousel3 }}"
+              },
+              {
+                "name": "is_carousel_item",
+                "value": "true"
+              }
+            ]
+          }
+        }
+      },
+      "type": "n8n-nodes-base.facebookGraphApi",
+      "typeVersion": 1,
+      "position": [
+        0,
+        460
+      ],
+      "id": "005b1b8a-a651-4a29-8b9d-9731de653b33",
+      "name": "Facebook Graph API3",
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "e41edd0d-31ad-4653-9664-b4028ac72da0",
+              "leftValue": "={{ $json.carousel2 }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -260,
+        320
+      ],
+      "id": "ccbdbb81-87a6-4688-9684-a2366483c2a1",
+      "name": "Has Image 2"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "e41edd0d-31ad-4653-9664-b4028ac72da0",
+              "leftValue": "={{ $json.carousel3 }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -260,
+        480
+      ],
+      "id": "55c165bf-4766-430c-8d1c-bf7291b3dcbd",
+      "name": "Has Image 3"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "e41edd0d-31ad-4653-9664-b4028ac72da0",
+              "leftValue": "={{ $json['mainimage'] }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -260,
+        20
+      ],
+      "id": "cfe83d6d-5e1a-456d-8f10-02839e822322",
+      "name": "Has Main Image"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "e41edd0d-31ad-4653-9664-b4028ac72da0",
+              "leftValue": "={{ $json.carousel1 }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -260,
+        180
+      ],
+      "id": "69dd00f7-c2c3-4189-8cc2-57d3184de48f",
+      "name": "Has Image 1"
+    },
+    {
+      "parameters": {
+        "numberInputs": 4
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.1,
+      "position": [
+        640,
+        220
+      ],
+      "id": "b732f481-37f2-4a6c-ad68-7d4e7cd73c38",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "httpRequestMethod": "POST",
+        "graphApiVersion": "v22.0",
+        "node": "={{ $json.Node }}",
+        "edge": "media",
+        "options": {
+          "queryParameters": {
+            "parameter": [
+              {
+                "name": "caption",
+                "value": "={{ $json.Caption }}"
+              },
+              {
+                "name": "media_type",
+                "value": "CAROUSEL"
+              },
+              {
+                "name": "children",
+                "value": "={{ $('Prepare Carousel Media IDs').item.json.children }}"
+              }
+            ]
+          }
+        }
+      },
+      "type": "n8n-nodes-base.facebookGraphApi",
+      "typeVersion": 1,
+      "position": [
+        1420,
+        260
+      ],
+      "id": "e69a097f-8649-4a58-a24a-4b821fadb4c4",
+      "name": "Create Carousel Container"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={\n  \"children\": \"{{ $items().map(item => item.json.id).join(',') }}\"\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        840,
+        240
+      ],
+      "id": "ccd89c35-ed70-4be5-8f09-db9bc3485cf5",
+      "name": "Prepare Carousel Media IDs",
+      "executeOnce": true
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.1,
+      "position": [
+        1200,
+        260
+      ],
+      "id": "5e88eda3-cf06-41a6-ab3b-3990647a7547",
+      "name": "Merge Media + Metadata"
+    },
+    {
+      "parameters": {
+        "httpRequestMethod": "POST",
+        "graphApiVersion": "v22.0",
+        "node": "={{ $json.Node }}",
+        "edge": "media",
+        "options": {
+          "queryParameters": {
+            "parameter": [
+              {
+                "name": "image_url",
+                "value": "={{ $json.carousel1 }}"
+              },
+              {
+                "name": "is_carousel_item",
+                "value": "true"
+              }
+            ]
+          }
+        }
+      },
+      "type": "n8n-nodes-base.facebookGraphApi",
+      "typeVersion": 1,
+      "position": [
+        0,
+        160
+      ],
+      "id": "7cd3754d-d19c-40d0-b405-1990b193fe0d",
+      "name": "Facebook Graph API1",
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "f5018c95-bb3a-4a7c-a29e-18e3281140ae",
+              "leftValue": "={{ $json.statusCode }}",
+              "rightValue": 400,
+              "operator": {
+                "type": "number",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        220,
+        0
+      ],
+      "id": "f7302048-dc91-4992-9174-3bdb5d685e20",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "f5018c95-bb3a-4a7c-a29e-18e3281140ae",
+              "leftValue": "={{ $json.statusCode }}",
+              "rightValue": 400,
+              "operator": {
+                "type": "number",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        220,
+        160
+      ],
+      "id": "e64272ab-4110-4748-9667-8dcfa200cb97",
+      "name": "If1"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "f5018c95-bb3a-4a7c-a29e-18e3281140ae",
+              "leftValue": "={{ $json.statusCode }}",
+              "rightValue": 400,
+              "operator": {
+                "type": "number",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        220,
+        300
+      ],
+      "id": "38cda22f-439c-4f22-a756-b9a7fa5e1b26",
+      "name": "If2"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "f5018c95-bb3a-4a7c-a29e-18e3281140ae",
+              "leftValue": "={{ $json.statusCode }}",
+              "rightValue": 400,
+              "operator": {
+                "type": "number",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        220,
+        460
+      ],
+      "id": "24b7795c-b081-4c7d-83a8-08502e226aef",
+      "name": "If3"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Is Uploaded?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Has Main Image",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Has Image 1",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Has Image 2",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Has Image 3",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Merge Media + Metadata",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Post to IG": {
+      "main": [
+        [
+          {
+            "node": "Mark Uploaded",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is Uploaded?": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Facebook Graph API": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Has Image 2": {
+      "main": [
+        [
+          {
+            "node": "Facebook Graph API2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Has Image 3": {
+      "main": [
+        [
+          {
+            "node": "Facebook Graph API3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Has Main Image": {
+      "main": [
+        [
+          {
+            "node": "Facebook Graph API",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Has Image 1": {
+      "main": [
+        [
+          {
+            "node": "Facebook Graph API1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Facebook Graph API2": {
+      "main": [
+        [
+          {
+            "node": "If2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Facebook Graph API3": {
+      "main": [
+        [
+          {
+            "node": "If3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Prepare Carousel Media IDs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Carousel Media IDs": {
+      "main": [
+        [
+          {
+            "node": "Merge Media + Metadata",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge Media + Metadata": {
+      "main": [
+        [
+          {
+            "node": "Create Carousel Container",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Carousel Container": {
+      "main": [
+        [
+          {
+            "node": "Post to IG",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Facebook Graph API1": {
+      "main": [
+        [
+          {
+            "node": "If1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If1": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "If2": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 2
+          }
+        ]
+      ]
+    },
+    "If3": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 3
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "1c1a9a3d-f882-467a-be16-1179f0644179",
+  "meta": {
+    "instanceId": "ad604eed9bc7266d7c51f1601812cdcd257bed52b6e8cc7b101f01f2c0f27d74"
+  },
+  "id": "jjcbBWjY6m4NSYsd",
+  "tags": []
+}
